@@ -1,9 +1,18 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 
-exports.verifyLogin = function(req, res) {
-  console.log('verify');
-  res.end();
+exports.verifyLogin = async function(req, res) {
+  
+  const user = await User.findOne({username: req.body.username});
+  
+  if(user) {
+    const passCorrect = await bcrypt.compare(req.body.password, user.password);
+    (passCorrect) ? res.status(200).send('user exists') : 
+      res.status(404).send('incorrect password');
+  } else {
+    res.status(404).send('incorrect username');
+  }
+
 };
 
 exports.newUser = async function(req, res) {
